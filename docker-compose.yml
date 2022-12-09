@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  oauth-mysql:
+    container_name: "oauth-mysql"
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=oauth
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./backup/mysql:/var/lib/mysql
