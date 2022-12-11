@@ -1,0 +1,10 @@
+mysql:
+  USER: "root"
+  PASS: "root"
+  DB_NAME: "root"
+  HOST: "localhost"
+  PORT: 3306
+
+redis:
+  HOST: "localhost"
+  PORT: "1111"

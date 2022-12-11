@@ -1,4 +1,4 @@
 WEB_SERVICE:
   SERVER_NAME: "oauth"
   HOST: "localhost"
-  PORT: "8000"
+  PORT: 8000

@@ -26,7 +26,7 @@ func (m membersUseCase) NewMember(user string, pass string, fistName string, las
 func (m membersUseCase) FindMemberById(id string) (*domain.Members, error) {
 	mem, err := m.membersRepo.Get(id)
 	if err != nil {
-		return mem, errors.New("error find member !!")
+		return mem, errors.New("error find member ")
 	} else if mem.Mid == "" {
 		return mem, errors.New("not found member")
 	}

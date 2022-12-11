@@ -10,7 +10,7 @@ func main() {
 	log.Println(conn, err)
 
 	file := pkg.NewFile()
-	content, _ := file.Read("env/mysql.yml")
+	content, _ := file.Read("env/db.yml")
 
 	yml := pkg.NewYaml()
 	data, err := yml.ToMap(content)
