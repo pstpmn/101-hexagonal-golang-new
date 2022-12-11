@@ -1,12 +1,11 @@
 package domains
 
 import (
-	"github.com/google/uuid"
 	"time"
 )
 
 type Members struct {
-	Mid          uuid.UUID
+	Mid          string
 	Username     string
 	Password     string
 	FirstName    string
@@ -16,7 +15,7 @@ type Members struct {
 	CreatedAt    time.Time
 }
 
-func NewMember(id uuid.UUID, username string, password string, firstName string, lastName string, dateOfBird time.Time, registerType int, createdAt time.Time) *Members {
+func NewMember(id string, username string, password string, firstName string, lastName string, dateOfBird time.Time, registerType int, createdAt time.Time) *Members {
 	return &Members{
 		Mid:          id,
 		Username:     username,

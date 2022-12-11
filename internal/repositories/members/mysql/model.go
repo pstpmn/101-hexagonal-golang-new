@@ -1,13 +1,12 @@
 package mysql
 
 import (
-	"github.com/google/uuid"
 	"lean-oauth/internal/repositories/register_categories/mysql"
 	"time"
 )
 
 type MembersModel struct {
-	Mid                uuid.UUID                      `gorm:"column:mid;primary_key;"`
+	Mid                string                         `gorm:"column:mid;primary_key;"`
 	Username           string                         `gorm:"column:username;unique"`
 	Password           string                         `gorm:"column:password;"`
 	FirstName          string                         `gorm:"column:firstName;"`

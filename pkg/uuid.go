@@ -2,11 +2,17 @@ package pkg
 
 import "github.com/google/uuid"
 
-func RandomUUIDAsString() string {
-	return uuid.New().String()
+type IUuid interface {
+	Random() string
 }
 
-func SafeUUIDFromString(s string) uuid.UUID {
-	val, _ := uuid.Parse(s)
-	return val
+type u struct {
+}
+
+func NewUuId() IUuid {
+	return &u{}
+}
+
+func (u u) Random() string {
+	return uuid.New().String()
 }

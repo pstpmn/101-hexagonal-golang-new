@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 	domain "lean-oauth/internal/core/domains"
 	"lean-oauth/internal/core/ports"
@@ -17,7 +16,7 @@ func NewTodoMysqlRepo(db *gorm.DB) ports.MembersRepository {
 	}
 }
 
-func (m membersMysqlRepo) Get(id uuid.UUID) (*domain.Members, error) {
+func (m membersMysqlRepo) Get(id string) (*domain.Members, error) {
 	var mem *domain.Members
 	err := m.db.First(&MembersModel{Mid: id}).Scan(&mem).Error
 	return mem, err

@@ -1,12 +1,11 @@
 package ports
 
 import (
-	"github.com/google/uuid"
 	domain "lean-oauth/internal/core/domains"
 )
 
 type MembersRepository interface {
-	Get(id uuid.UUID) (*domain.Members, error)
+	Get(id string) (*domain.Members, error)
 	List() ([]domain.Members, error)
 	Create(todo *domain.Members) (*domain.Members, error)
 }

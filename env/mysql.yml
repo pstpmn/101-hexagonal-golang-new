@@ -1,0 +1,5 @@
+USER: "root"
+PASS: "root"
+DB_NAME: "root"
+HOST: "localhost"
+PORT: 3306
