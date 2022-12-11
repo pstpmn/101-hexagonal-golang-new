@@ -1,17 +1,23 @@
 package main
 
 import (
-	memModel "lean-oauth/internal/repositories/members/mysql"
-	regisCatModel "lean-oauth/internal/repositories/register_categories/mysql"
 	"lean-oauth/pkg"
+	"log"
 )
 
 func main() {
+	var conn, err = pkg.NewConnect("root", "root", "oauth", "0.0.0.0", "3306")
+	log.Println(conn, err)
 
-	var conn, err = pkg.NewConnect("root", "root", "oauth", "0.0.0.0", "3306").Connect()
-	if err != nil {
-		panic(err)
-	}
-	pkg.AutoMigrate(conn, memModel.MembersModel{})
-	pkg.AutoMigrate(conn, regisCatModel.RegisterCategoriesModel{})
+	file := pkg.NewFile()
+	content, _ := file.Read("env/mysql.yml")
+
+	yml := pkg.NewYaml()
+	data, err := yml.ToMap(content)
+	log.Println(data, err)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//pkg.AutoMigrate(conn, memModel.MembersModel{})
+	//pkg.AutoMigrate(conn, regisCatModel.RegisterCategoriesModel{})
 }
