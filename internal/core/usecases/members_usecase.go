@@ -11,6 +11,7 @@ type membersUseCase struct {
 	membersRepo        ports.MembersRepository
 	RegisterCategories ports.RegisterCategories
 	UidService         ports.IUuidService
+	CryptoService      ports.ICrypto
 }
 
 func NewMembersUseCase(members ports.MembersRepository, categories ports.RegisterCategories) ports.MembersUseCase {

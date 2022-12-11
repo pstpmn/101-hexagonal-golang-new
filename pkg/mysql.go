@@ -8,6 +8,7 @@ import (
 
 type Mysql interface {
 	AutoMigrate(model interface{}) error
+	GetInstance() *gorm.DB
 }
 
 type conn struct {
@@ -20,6 +21,10 @@ func NewConnect(user string, pass string, dbName string, host string, port strin
 	return &conn{
 		db: db,
 	}, err
+}
+
+func (c conn) GetInstance() *gorm.DB {
+	return c.db
 }
 
 func (c conn) AutoMigrate(model interface{}) error {
