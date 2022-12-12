@@ -6,6 +6,7 @@ import (
 
 type MembersRepository interface {
 	Get(id string) (*domain.Members, error)
+	GetByUser(user string) (*domain.Members, error)
 	List() ([]domain.Members, error)
 	Create(todo *domain.Members) (*domain.Members, error)
 }

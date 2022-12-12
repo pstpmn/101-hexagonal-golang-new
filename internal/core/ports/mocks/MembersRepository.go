@@ -59,6 +59,29 @@ func (_m *MembersRepository) Get(id string) (*domains.Members, error) {
 	return r0, r1
 }
 
+// GetByUser provides a mock function with given fields: user
+func (_m *MembersRepository) GetByUser(user string) (*domains.Members, error) {
+	ret := _m.Called(user)
+
+	var r0 *domains.Members
+	if rf, ok := ret.Get(0).(func(string) *domains.Members); ok {
+		r0 = rf(user)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domains.Members)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(user)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // List provides a mock function with given fields:
 func (_m *MembersRepository) List() ([]domains.Members, error) {
 	ret := _m.Called()
