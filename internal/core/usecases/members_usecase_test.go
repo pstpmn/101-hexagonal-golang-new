@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package usecases
 
 import (
@@ -163,40 +166,3 @@ func Test_membersUseCase_FindMemberById(t *testing.T) {
 		})
 	}
 }
-
-//func Test_membersUseCase_FindMemberById(t *testing.T) {
-//	type fields struct {
-//		membersRepo        ports.MembersRepository
-//		RegisterCategories ports.RegisterCategories
-//		UidService         ports.IUuidService
-//	}
-//	type args struct {
-//		id string
-//	}
-//	tests := []struct {
-//		name    string
-//		fields  fields
-//		args    args
-//		want    *domain.Members
-//		wantErr bool
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			m := membersUseCase{
-//				membersRepo:        tt.fields.membersRepo,
-//				RegisterCategories: tt.fields.RegisterCategories,
-//				UidService:         tt.fields.UidService,
-//			}
-//			got, err := m.FindMemberById(tt.args.id)
-//			if (err != nil) != tt.wantErr {
-//				t.Errorf("FindMemberById() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("FindMemberById() got = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}

@@ -14,18 +14,18 @@ type membersUseCase struct {
 	CryptoService      ports.ICryptoService
 }
 
-func NewMembersUseCase(members ports.MembersRepository, categories ports.RegisterCategories) ports.MembersUseCase {
-	return &membersUseCase{membersRepo: members, RegisterCategories: categories}
+func NewMembersUseCase(members ports.MembersRepository, categories ports.RegisterCategories, uidService ports.IUuidService, crypto ports.ICryptoService) ports.MembersUseCase {
+	return &membersUseCase{membersRepo: members, RegisterCategories: categories, UidService: uidService, CryptoService: crypto}
 }
 
 func (m membersUseCase) NewMember(user string, pass string, fistName string, lastName string, dob time.Time) (*domain.Members, error) {
 	var uuid string = m.UidService.Random()
 	encryptPass, err := m.CryptoService.Bcrypt(pass)
+	member := domain.Members{Mid: uuid, Username: user, Password: encryptPass, FirstName: fistName, LastName: lastName, DateOfBird: dob, RegisterType: 1, CreatedAt: time.Now()}
+
 	if err != nil {
 		return &domain.Members{}, errors.New("error encrypt pass")
 	}
-
-	member := domain.Members{Mid: uuid, Username: user, Password: encryptPass, FirstName: fistName, LastName: lastName, DateOfBird: dob, RegisterType: 1, CreatedAt: time.Now()}
 
 	// validate username
 	isUsed, err := m.membersRepo.GetByUser(user)
@@ -36,7 +36,10 @@ func (m membersUseCase) NewMember(user string, pass string, fistName string, las
 	}
 
 	result, err := m.membersRepo.Create(&member)
-	return result, err
+	if err != nil {
+		return &domain.Members{}, errors.New("error create member")
+	}
+	return result, nil
 }
 
 func (m membersUseCase) FindMemberById(id string) (*domain.Members, error) {

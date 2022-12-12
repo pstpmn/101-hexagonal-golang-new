@@ -16,7 +16,7 @@ func (m membersMysqlRepo) GetByUser(user string) (*domain.Members, error) {
 	return mem, err
 }
 
-func NewTodoMysqlRepo(db *gorm.DB) ports.MembersRepository {
+func NewMembersMysqlRepo(db *gorm.DB) ports.MembersRepository {
 	return &membersMysqlRepo{
 		db: db,
 	}

@@ -4,7 +4,7 @@ import (
 	"lean-oauth/pkg"
 )
 
-var conn, err = pkg.NewConnect("root", "root", "oauth", "0.0.0.0", "3306")
+var conn, err = pkg.NewConnectMysql("root", "root", "oauth", "0.0.0.0", "3306")
 
 //
 //func Test_registerCategoriesMysqlRepo_List(t *testing.T) {
