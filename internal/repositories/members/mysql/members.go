@@ -10,6 +10,12 @@ type membersMysqlRepo struct {
 	db *gorm.DB
 }
 
+func (m membersMysqlRepo) GetByUser(user string) (*domain.Members, error) {
+	var mem *domain.Members
+	err := m.db.First(&MembersModel{Username: user}).Scan(&mem).Error
+	return mem, err
+}
+
 func NewTodoMysqlRepo(db *gorm.DB) ports.MembersRepository {
 	return &membersMysqlRepo{
 		db: db,
@@ -23,8 +29,9 @@ func (m membersMysqlRepo) Get(id string) (*domain.Members, error) {
 }
 
 func (m membersMysqlRepo) List() ([]domain.Members, error) {
-	//TODO implement me
-	panic("implement me")
+	var mem []domain.Members
+	err := m.db.Model(&MembersModel{}).Scan(&mem).Error
+	return mem, err
 }
 
 func (m membersMysqlRepo) Create(todo *domain.Members) (*domain.Members, error) {

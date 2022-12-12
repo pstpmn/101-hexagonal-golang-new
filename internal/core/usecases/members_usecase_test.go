@@ -5,7 +5,6 @@ import (
 	domain "lean-oauth/internal/core/domains"
 	"lean-oauth/internal/core/ports"
 	_membersMock "lean-oauth/internal/core/ports/mocks"
-	"log"
 	"reflect"
 	"testing"
 	"time"
@@ -15,17 +14,23 @@ func Test_membersUseCase_NewMember(t *testing.T) {
 	uuid := "f43ab0cc-8653-42dc-853d-fdee58a17cd6"
 	mockRequest := &domain.Members{Mid: uuid, Username: "1", Password: "root", FirstName: "root", LastName: "root", DateOfBird: time.Now(), RegisterType: 1, CreatedAt: time.Now()}
 	mockMembersRepo := new(_membersMock.MembersRepository)
+	mockMembersRepoCaseTwo := new(_membersMock.MembersRepository)
 	mockCatepgoriesRepo := new(_membersMock.RegisterCategories)
 	mockUidService := new(_membersMock.IUuidService)
+	mockCryptoService := new(_membersMock.ICryptoService)
 
-	// บอกว่าเราเรียกใช้ function ไหนของ Repository
 	mockMembersRepo.On("Create", mock.AnythingOfType("*domains.Members")).Return(mockRequest, nil)
+	mockMembersRepo.On("GetByUser", mock.AnythingOfType("string")).Return(&domain.Members{}, nil)
 	mockUidService.On("Random").Return(uuid)
+	mockCryptoService.On("Bcrypt", mock.AnythingOfType("string")).Return("encript", nil)
+	mockMembersRepoCaseTwo.On("Create", mock.AnythingOfType("*domains.Members")).Return(&domain.Members{}, nil)
+	mockMembersRepoCaseTwo.On("GetByUser", mock.AnythingOfType("string")).Return(mockRequest, nil)
 
 	type fields struct {
 		membersRepo        ports.MembersRepository
 		RegisterCategories ports.RegisterCategories
 		uidService         ports.IUuidService
+		cryptoService      ports.ICryptoService
 	}
 	type args struct {
 		user     string
@@ -35,29 +40,47 @@ func Test_membersUseCase_NewMember(t *testing.T) {
 		dob      time.Time
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		//want    *domain.Members
+		name    string
+		fields  fields
+		args    args
+		want    *domain.Members
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
-			"test new member",
+			"test create member should be success",
 			fields{
 				mockMembersRepo,
 				mockCatepgoriesRepo,
 				mockUidService,
+				mockCryptoService,
 			},
 			args{
-				"root2",
+				"root",
 				"root",
 				"root",
 				"root",
 				time.Now(),
 			},
-			//mockRequest,
+			mockRequest,
 			false,
+		},
+		{
+			"test create member should be error because username is used",
+			fields{
+				mockMembersRepoCaseTwo,
+				mockCatepgoriesRepo,
+				mockUidService,
+				mockCryptoService,
+			},
+			args{
+				"root",
+				"root",
+				"root",
+				"root",
+				time.Now(),
+			},
+			&domain.Members{},
+			true,
 		},
 	}
 	for _, tt := range tests {
@@ -67,16 +90,16 @@ func Test_membersUseCase_NewMember(t *testing.T) {
 				membersRepo:        tt.fields.membersRepo,
 				RegisterCategories: tt.fields.RegisterCategories,
 				UidService:         tt.fields.uidService,
+				CryptoService:      tt.fields.cryptoService,
 			}
-			d, err := m.NewMember(tt.args.user, tt.args.pass, tt.args.fistName, tt.args.lastName, tt.args.dob)
-			log.Println("1 : ", d)
+			got, err := m.NewMember(tt.args.user, tt.args.pass, tt.args.fistName, tt.args.lastName, tt.args.dob)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewMember() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			//if !reflect.DeepEqual(got, tt.want) {
-			//	t.Errorf("NewMember() got = %v, want %v", got, tt.want)
-			//}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewMember() got = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }
