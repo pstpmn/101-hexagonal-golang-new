@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"lean-oauth/internal/core/usecases"
-	"lean-oauth/internal/handlers/http/members"
+	handlers "lean-oauth/internal/handlers/http/members"
 	membersRepositories "lean-oauth/internal/repositories/members/mysql"
 	categoriesRepositories "lean-oauth/internal/repositories/register_categories/mysql"
+	"lean-oauth/internal/server"
 	"lean-oauth/pkg"
-	"strconv"
 )
 
 func main() {
@@ -25,13 +24,17 @@ func main() {
 
 	mysqlEnv := dbEnv["MYSQL"].(map[string]interface{})
 	serviceEnv := appEnv["SERVICE"].(map[string]interface{})
-	mysqlPort := strconv.Itoa(mysqlEnv["PORT"].(int))
-	servicePort := strconv.Itoa(serviceEnv["PORT"].(int))
 
 	// connect db
-	var conn, err = pkg.NewConnectMysql(mysqlEnv["USER"].(string), mysqlEnv["PASS"].(string), mysqlEnv["DB_NAME"].(string), mysqlEnv["HOST"].(string), mysqlPort)
+	var conn, err = pkg.NewConnectMysql(
+		mysqlEnv["USER"].(string),
+		mysqlEnv["PASS"].(string),
+		mysqlEnv["DB_NAME"].(string),
+		mysqlEnv["HOST"].(string),
+		fmt.Sprintf("%d", mysqlEnv["PORT"].(int)),
+	)
+
 	if err != nil {
-		// err connection
 		panic(err)
 	}
 
@@ -43,10 +46,8 @@ func main() {
 	membersUsercase := usecases.NewMembersUseCase(membersRepo, categoriesRepo, uuid, crypto)
 
 	// handlers
-	handlers := handlers.NewHTTPHandler(membersUsercase)
+	handlers := handlers.NewHTTPHandler(membersUsercase, server.NewResponse())
 
-	// create server
-	app := fiber.New()
-	app.Get("/", handlers.HelloWorld)
-	app.Listen(fmt.Sprintf(":%s", servicePort))
+	server := server.NewServer(handlers, serviceEnv)
+	server.Initialize()
 }
