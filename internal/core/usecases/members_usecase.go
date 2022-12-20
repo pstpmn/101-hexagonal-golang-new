@@ -27,12 +27,9 @@ func (m membersUseCase) NewMember(user string, pass string, fistName string, las
 		return &domain.Members{}, errors.New("error encrypt pass")
 	}
 
-	// validate username
-	isUsed, err := m.membersRepo.GetByUser(user)
-	if err != nil {
-		return &domain.Members{}, errors.New("error find member")
-	} else if isUsed.Mid != "" {
-		return &domain.Members{}, errors.New("username is used")
+	// validate username is used
+	if findMember := m.membersRepo.GetByUser(user); findMember.Mid != "" {
+		return &domain.Members{}, errors.New("username is already in used")
 	}
 
 	result, err := m.membersRepo.Create(&member)

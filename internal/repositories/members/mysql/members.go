@@ -1,19 +1,20 @@
 package mysql
 
 import (
-	"gorm.io/gorm"
 	domain "lean-oauth/internal/core/domains"
 	"lean-oauth/internal/core/ports"
+
+	"gorm.io/gorm"
 )
 
 type membersMysqlRepo struct {
 	db *gorm.DB
 }
 
-func (m membersMysqlRepo) GetByUser(user string) (*domain.Members, error) {
+func (m membersMysqlRepo) GetByUser(user string) *domain.Members {
 	var mem *domain.Members
-	err := m.db.First(&MembersModel{Username: user}).Scan(&mem).Error
-	return mem, err
+	m.db.Table("members").Where("username = ? ", user).Take(&mem)
+	return mem
 }
 
 func NewMembersMysqlRepo(db *gorm.DB) ports.MembersRepository {

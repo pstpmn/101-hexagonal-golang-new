@@ -1,16 +1,14 @@
-//go:build integration
-// +build integration
-
 package usecases
 
 import (
-	"github.com/stretchr/testify/mock"
 	domain "lean-oauth/internal/core/domains"
 	"lean-oauth/internal/core/ports"
 	_membersMock "lean-oauth/internal/core/ports/mocks"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/mock"
 )
 
 func Test_membersUseCase_NewMember(t *testing.T) {
@@ -121,6 +119,7 @@ func Test_membersUseCase_FindMemberById(t *testing.T) {
 		membersRepo        ports.MembersRepository
 		RegisterCategories ports.RegisterCategories
 	}
+
 	type args struct {
 		id string
 	}

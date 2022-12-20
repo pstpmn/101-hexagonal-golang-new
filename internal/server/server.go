@@ -26,7 +26,9 @@ func (s server) Initialize() {
 	s.routes(app)
 
 	// init app
-	app.Listen(fmt.Sprintf(":%d", s.env["PORT"]))
+	if err := app.Listen(fmt.Sprintf(":%d", s.env["PORT"])); err != nil {
+		panic(err)
+	}
 }
 
 func (s server) routes(app *fiber.App) {
