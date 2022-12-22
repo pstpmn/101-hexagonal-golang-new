@@ -165,3 +165,75 @@ func Test_membersUseCase_FindMemberById(t *testing.T) {
 		})
 	}
 }
+
+func Test_membersUseCase_Authentication(t *testing.T) {
+	uuid := "f43ab0cc-8653-42dc-853d-fdee58a17cd6"
+	mockResponse := &domain.Members{Mid: uuid, Username: "root", Password: "root", FirstName: "root", LastName: "root", DateOfBird: time.Now(), RegisterType: 1, CreatedAt: time.Now()}
+	mockMembersRepo := new(_membersMock.MembersRepository)
+	mockMembersRepoCaseTwo := new(_membersMock.MembersRepository)
+	mockCatepgoriesRepo := new(_membersMock.RegisterCategories)
+	mockUidService := new(_membersMock.IUuidService)
+	mockCryptoService := new(_membersMock.ICryptoService)
+
+	mockMembersRepo.On("GetByUser", mock.AnythingOfType("string")).Return(mockResponse)
+	mockMembersRepoCaseTwo.On("GetByUser", mock.AnythingOfType("string")).Return(&domain.Members{})
+	//mockUidService.On("Random").Return(uuid)
+	mockCryptoService.On("ValidateBcrypt", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(true)
+
+	type fields struct {
+		membersRepo        ports.MembersRepository
+		RegisterCategories ports.RegisterCategories
+		UidService         ports.IUuidService
+		CryptoService      ports.ICryptoService
+	}
+	type args struct {
+		user string
+		pass string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *domain.Members
+		wantErr bool
+	}{
+		{
+			"test usecase should be auth success",
+			fields{mockMembersRepo, mockCatepgoriesRepo, mockUidService, mockCryptoService},
+			args{
+				"root",
+				"root",
+			},
+			mockResponse,
+			false,
+		},
+		{
+			"test usecase should be fail because username not found",
+			fields{mockMembersRepoCaseTwo, mockCatepgoriesRepo, mockUidService, mockCryptoService},
+			args{
+				"root",
+				"root",
+			},
+			&domain.Members{},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := membersUseCase{
+				membersRepo:        tt.fields.membersRepo,
+				RegisterCategories: tt.fields.RegisterCategories,
+				UidService:         tt.fields.UidService,
+				CryptoService:      tt.fields.CryptoService,
+			}
+			got, err := m.Authentication(tt.args.user, tt.args.pass)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Authentication() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Authentication() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

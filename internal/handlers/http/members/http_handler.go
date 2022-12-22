@@ -48,3 +48,12 @@ func (hdl *HTTPHandler) Registration(c *fiber.Ctx) error {
 
 	return hdl.response.Json(c, fiber.StatusCreated, "register successful", result, true)
 }
+
+func (hdl *HTTPHandler) Authentication(c *fiber.Ctx) error {
+	req := &AuthenticationRequest{}
+	if err := c.BodyParser(req); err != nil {
+		return hdl.response.ErrorRequestBody(c)
+	}
+
+	panic("implement me")
+}

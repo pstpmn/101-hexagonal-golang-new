@@ -12,6 +12,11 @@ type RegistrationRequest struct {
 	Dob      string `json:"dob" form:"dob"`
 }
 
+type AuthenticationRequest struct {
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
+}
+
 func (c RegistrationRequest) Validate() error {
 	return validation.ValidateStruct(&c,
 		validation.Field(&c.Username, validation.Required),
@@ -19,5 +24,12 @@ func (c RegistrationRequest) Validate() error {
 		validation.Field(&c.FistName, validation.Required),
 		validation.Field(&c.LastName, validation.Required),
 		validation.Field(&c.Dob, validation.Required, validation.Date("2006-01-02")),
+	)
+}
+
+func (c AuthenticationRequest) Validate() error {
+	return validation.ValidateStruct(&c,
+		validation.Field(&c.Username, validation.Required),
+		validation.Field(&c.Password, validation.Required),
 	)
 }

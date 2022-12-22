@@ -48,3 +48,19 @@ func (m membersUseCase) FindMemberById(id string) (*domain.Members, error) {
 	}
 	return mem, err
 }
+
+func (m membersUseCase) Authentication(user string, pass string) (*domain.Members, error) {
+	// find username
+	// then not found stop flow and return error message to user
+	mem := m.membersRepo.GetByUser(user)
+	if mem.Mid == "" {
+		return &domain.Members{}, errors.New("not found username")
+	}
+
+	// then found member
+	// validate raw password and encript password
+	if isValid := m.CryptoService.ValidateBcrypt(pass, mem.Password); isValid == false {
+		return &domain.Members{}, errors.New("invalid username or password")
+	}
+	return mem, nil
+}
