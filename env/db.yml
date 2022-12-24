@@ -3,7 +3,7 @@ MYSQL:
   PASS: "root"
   DB_NAME: "oauth"
   HOST: "localhost"
-  PORT: 3306
+  PORT: 3366
 
 REDIS:
   HOST: "localhost"

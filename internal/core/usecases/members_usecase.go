@@ -12,10 +12,11 @@ type membersUseCase struct {
 	RegisterCategories ports.RegisterCategories
 	UidService         ports.IUuidService
 	CryptoService      ports.ICryptoService
+	JwtService         ports.IJwtService
 }
 
-func NewMembersUseCase(members ports.MembersRepository, categories ports.RegisterCategories, uidService ports.IUuidService, crypto ports.ICryptoService) ports.MembersUseCase {
-	return &membersUseCase{membersRepo: members, RegisterCategories: categories, UidService: uidService, CryptoService: crypto}
+func NewMembersUseCase(members ports.MembersRepository, categories ports.RegisterCategories, uidService ports.IUuidService, crypto ports.ICryptoService, jwt ports.IJwtService) ports.MembersUseCase {
+	return &membersUseCase{membersRepo: members, RegisterCategories: categories, UidService: uidService, CryptoService: crypto, JwtService: jwt}
 }
 
 func (m membersUseCase) NewMember(user string, pass string, fistName string, lastName string, dob time.Time) (*domain.Members, error) {
@@ -49,18 +50,19 @@ func (m membersUseCase) FindMemberById(id string) (*domain.Members, error) {
 	return mem, err
 }
 
-func (m membersUseCase) Authentication(user string, pass string) (*domain.Members, error) {
+func (m membersUseCase) Authentication(user string, pass string, tokenKey string) (string, *domain.Members, error) {
 	// find username
 	// then not found stop flow and return error message to user
 	mem := m.membersRepo.GetByUser(user)
 	if mem.Mid == "" {
-		return &domain.Members{}, errors.New("not found username")
+		return "", &domain.Members{}, errors.New("not found username")
 	}
 
 	// then found member
 	// validate raw password and encript password
 	if isValid := m.CryptoService.ValidateBcrypt(pass, mem.Password); isValid == false {
-		return &domain.Members{}, errors.New("invalid username or password")
+		return "", &domain.Members{}, errors.New("invalid username or password")
 	}
-	return mem, nil
+
+	return "", mem, nil
 }

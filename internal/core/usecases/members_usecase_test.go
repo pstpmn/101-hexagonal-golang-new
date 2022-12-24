@@ -226,7 +226,7 @@ func Test_membersUseCase_Authentication(t *testing.T) {
 				UidService:         tt.fields.UidService,
 				CryptoService:      tt.fields.CryptoService,
 			}
-			got, err := m.Authentication(tt.args.user, tt.args.pass)
+			_, got, err := m.Authentication(tt.args.user, tt.args.pass)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Authentication() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package pkg
 
 // func Test_conn_Connect(t *testing.T) {

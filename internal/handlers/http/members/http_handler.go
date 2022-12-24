@@ -55,5 +55,14 @@ func (hdl *HTTPHandler) Authentication(c *fiber.Ctx) error {
 		return hdl.response.ErrorRequestBody(c)
 	}
 
-	panic("implement me")
+	mem, err := hdl.membersUseCase.Authentication(req.Username, req.Password)
+	if err != nil {
+		return hdl.response.Json(c, fiber.StatusOK, fmt.Sprint(err), nil, false)
+	}
+
+	result := map[string]interface{}{
+		"username":  mem.Username,
+		"createdAt": mem.CreatedAt,
+	}
+	return hdl.response.Json(c, fiber.StatusOK, "authentication successful", result, true)
 }

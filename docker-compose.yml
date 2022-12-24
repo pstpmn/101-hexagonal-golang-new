@@ -8,6 +8,6 @@ services:
       - MYSQL_DATABASE=oauth
       - MYSQL_ROOT_PASSWORD=root
     ports:
-      - '3306:3306'
+      - '3366:3306'
     volumes:
       - ./backup/mysql:/var/lib/mysql

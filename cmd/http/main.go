@@ -15,6 +15,7 @@ func main() {
 	yml := pkg.NewYaml()
 	crypto := pkg.NewCrypto()
 	uuid := pkg.NewUuId()
+	jwt := pkg.NewJsonWebToken()
 
 	// prepare environments
 	dbStr, _ := file.Read("env/db.yml")
@@ -43,7 +44,7 @@ func main() {
 	categoriesRepo := categoriesRepositories.NewRegisterCategoriesMysqlRepo(conn.GetInstance())
 
 	// usecases
-	membersUsercase := usecases.NewMembersUseCase(membersRepo, categoriesRepo, uuid, crypto)
+	membersUsercase := usecases.NewMembersUseCase(membersRepo, categoriesRepo, uuid, crypto, jwt)
 
 	// handlers
 	handlers := handlers.NewHTTPHandler(membersUsercase, server.NewResponse())

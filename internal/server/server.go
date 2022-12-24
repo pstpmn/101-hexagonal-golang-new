@@ -34,6 +34,7 @@ func (s server) Initialize() {
 func (s server) routes(app *fiber.App) {
 	app.Get("/", s.membersHandler.HelloWorld)
 	app.Post("registration", s.membersHandler.Registration)
+	app.Post("authentication", s.membersHandler.Authentication)
 }
 
 func (s server) middleware(app *fiber.App) {
