@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"errors"
 	domain "lean-oauth/internal/core/domains"
 	"lean-oauth/internal/core/ports"
 	_membersMock "lean-oauth/internal/core/ports/mocks"
@@ -168,23 +169,28 @@ func Test_membersUseCase_FindMemberById(t *testing.T) {
 
 func Test_membersUseCase_Authentication(t *testing.T) {
 	uuid := "f43ab0cc-8653-42dc-853d-fdee58a17cd6"
+	key := "secret"
+
 	mockResponse := &domain.Members{Mid: uuid, Username: "root", Password: "root", FirstName: "root", LastName: "root", DateOfBird: time.Now(), RegisterType: 1, CreatedAt: time.Now()}
 	mockMembersRepo := new(_membersMock.MembersRepository)
 	mockMembersRepoCaseTwo := new(_membersMock.MembersRepository)
 	mockCatepgoriesRepo := new(_membersMock.RegisterCategories)
 	mockUidService := new(_membersMock.IUuidService)
 	mockCryptoService := new(_membersMock.ICryptoService)
+	mockJwtService := new(_membersMock.IJwtService)
 
 	mockMembersRepo.On("GetByUser", mock.AnythingOfType("string")).Return(mockResponse)
 	mockMembersRepoCaseTwo.On("GetByUser", mock.AnythingOfType("string")).Return(&domain.Members{})
 	//mockUidService.On("Random").Return(uuid)
 	mockCryptoService.On("ValidateBcrypt", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(true)
+	mockJwtService.On("Generate", mock.AnythingOfType("map[string]interface {}"), "secret", mock.AnythingOfType("time.Time")).Return("mockToken", nil)
 
 	type fields struct {
 		membersRepo        ports.MembersRepository
 		RegisterCategories ports.RegisterCategories
 		UidService         ports.IUuidService
 		CryptoService      ports.ICryptoService
+		JwtService         ports.IJwtService
 	}
 	type args struct {
 		user string
@@ -199,7 +205,7 @@ func Test_membersUseCase_Authentication(t *testing.T) {
 	}{
 		{
 			"test usecase should be auth success",
-			fields{mockMembersRepo, mockCatepgoriesRepo, mockUidService, mockCryptoService},
+			fields{mockMembersRepo, mockCatepgoriesRepo, mockUidService, mockCryptoService, mockJwtService},
 			args{
 				"root",
 				"root",
@@ -209,7 +215,7 @@ func Test_membersUseCase_Authentication(t *testing.T) {
 		},
 		{
 			"test usecase should be fail because username not found",
-			fields{mockMembersRepoCaseTwo, mockCatepgoriesRepo, mockUidService, mockCryptoService},
+			fields{mockMembersRepoCaseTwo, mockCatepgoriesRepo, mockUidService, mockCryptoService, mockJwtService},
 			args{
 				"root",
 				"root",
@@ -225,8 +231,10 @@ func Test_membersUseCase_Authentication(t *testing.T) {
 				RegisterCategories: tt.fields.RegisterCategories,
 				UidService:         tt.fields.UidService,
 				CryptoService:      tt.fields.CryptoService,
+				JwtService:         mockJwtService,
 			}
-			_, got, err := m.Authentication(tt.args.user, tt.args.pass)
+
+			_, got, err := m.Authentication(tt.args.user, tt.args.pass, key)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Authentication() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -234,6 +242,93 @@ func Test_membersUseCase_Authentication(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Authentication() got = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func Test_membersUseCase_Authorization(t *testing.T) {
+	token := "testToken"
+	key := "secret"
+
+	mockMembersRepo := new(_membersMock.MembersRepository)
+	mockCatepgoriesRepo := new(_membersMock.RegisterCategories)
+	mockUidService := new(_membersMock.IUuidService)
+	mockCryptoService := new(_membersMock.ICryptoService)
+	mockJwtService := new(_membersMock.IJwtService)
+	mockJwtServiceCaseTwo := new(_membersMock.IJwtService)
+
+	mockJwtService.On("Extract", token, key).Return(map[string]string{}, nil)
+	mockJwtServiceCaseTwo.On("Extract", token, key).Return(map[string]string{}, errors.New("error invalid token"))
+
+	type fields struct {
+		membersRepo        ports.MembersRepository
+		RegisterCategories ports.RegisterCategories
+		UidService         ports.IUuidService
+		CryptoService      ports.ICryptoService
+		JwtService         ports.IJwtService
+	}
+	type args struct {
+		token string
+		key   string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		//want    map[string]string
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			"test authorization token should be success",
+			fields{
+				membersRepo:        mockMembersRepo,
+				RegisterCategories: mockCatepgoriesRepo,
+				UidService:         mockUidService,
+				CryptoService:      mockCryptoService,
+				JwtService:         mockJwtService,
+			},
+			args{
+				token: token,
+				key:   key,
+			},
+			//nil,
+			false,
+		},
+		{
+			"test authorization invalid token should be fails",
+			fields{
+				membersRepo:        mockMembersRepo,
+				RegisterCategories: mockCatepgoriesRepo,
+				UidService:         mockUidService,
+				CryptoService:      mockCryptoService,
+				JwtService:         mockJwtServiceCaseTwo,
+			},
+			args{
+				token: token,
+				key:   key,
+			},
+			//nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := membersUseCase{
+				membersRepo:        tt.fields.membersRepo,
+				RegisterCategories: tt.fields.RegisterCategories,
+				UidService:         tt.fields.UidService,
+				CryptoService:      tt.fields.CryptoService,
+				JwtService:         tt.fields.JwtService,
+			}
+			_, err := m.Authorization(tt.args.token, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Authorization() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			//if !reflect.DeepEqual(got, tt.want) {
+			//	t.Errorf("Authorization() got = %v, want %v", got, tt.want)
+			//}
 		})
 	}
 }

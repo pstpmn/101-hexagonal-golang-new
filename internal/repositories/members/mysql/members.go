@@ -1,10 +1,9 @@
 package mysql
 
 import (
+	"gorm.io/gorm"
 	domain "lean-oauth/internal/core/domains"
 	"lean-oauth/internal/core/ports"
-
-	"gorm.io/gorm"
 )
 
 type membersMysqlRepo struct {
@@ -12,9 +11,18 @@ type membersMysqlRepo struct {
 }
 
 func (m membersMysqlRepo) GetByUser(user string) *domain.Members {
-	var mem *domain.Members
-	m.db.Table("members").Where("username = ? ", user).Take(&mem)
-	return mem
+	model := &MembersModel{}
+	m.db.Model(&MembersModel{}).Where(&MembersModel{Username: user}).Scan(&model)
+	return &domain.Members{
+		Mid:          model.Mid,
+		Username:     model.Username,
+		Password:     model.Password,
+		FirstName:    model.FirstName,
+		LastName:     model.LastName,
+		DateOfBird:   model.DateOfBird,
+		CreatedAt:    model.CreatedAt,
+		RegisterType: model.RegisterId,
+	}
 }
 
 func NewMembersMysqlRepo(db *gorm.DB) ports.MembersRepository {
@@ -24,9 +32,18 @@ func NewMembersMysqlRepo(db *gorm.DB) ports.MembersRepository {
 }
 
 func (m membersMysqlRepo) Get(id string) (*domain.Members, error) {
-	var mem *domain.Members
-	err := m.db.First(&MembersModel{Mid: id}).Scan(&mem).Error
-	return mem, err
+	model := &MembersModel{}
+	err := m.db.Model(&MembersModel{}).Where(&MembersModel{Mid: id}).Scan(&model).Error
+	return &domain.Members{
+		Mid:          model.Mid,
+		Username:     model.Username,
+		Password:     model.Password,
+		FirstName:    model.FirstName,
+		LastName:     model.LastName,
+		DateOfBird:   model.DateOfBird,
+		CreatedAt:    model.CreatedAt,
+		RegisterType: model.RegisterId,
+	}, err
 }
 
 func (m membersMysqlRepo) List() ([]domain.Members, error) {

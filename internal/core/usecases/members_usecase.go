@@ -50,6 +50,11 @@ func (m membersUseCase) FindMemberById(id string) (*domain.Members, error) {
 	return mem, err
 }
 
+func (m membersUseCase) Authorization(token string, key string) (data map[string]string, err error) {
+	data, err = m.JwtService.Extract(token, key)
+	return
+}
+
 func (m membersUseCase) Authentication(user string, pass string, tokenKey string) (string, *domain.Members, error) {
 	// find username
 	// then not found stop flow and return error message to user
@@ -64,5 +69,19 @@ func (m membersUseCase) Authentication(user string, pass string, tokenKey string
 		return "", &domain.Members{}, errors.New("invalid username or password")
 	}
 
-	return "", mem, nil
+	encript := map[string]interface{}{
+		"memberId":  mem.Mid,
+		"username":  mem.Username,
+		"firstName": mem.FirstName,
+		"lastName":  mem.LastName,
+		"createdAt": mem.CreatedAt,
+		"dob":       mem.DateOfBird,
+	}
+	expired := time.Now().Add(time.Hour + 3)
+	token, err := m.JwtService.Generate(encript, tokenKey, expired)
+	if err != nil {
+		return "", &domain.Members{}, errors.New("error encript token")
+	}
+
+	return token, mem, nil
 }

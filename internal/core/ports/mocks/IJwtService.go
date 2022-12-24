@@ -37,18 +37,18 @@ func (_m *IJwtService) Extract(token string, key string) (map[string]string, err
 }
 
 // Generate provides a mock function with given fields: data, key, exp
-func (_m *IJwtService) Generate(data map[string]interface{}, key string, exp time.Timer) (string, error) {
+func (_m *IJwtService) Generate(data map[string]interface{}, key string, exp time.Time) (string, error) {
 	ret := _m.Called(data, key, exp)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(map[string]interface{}, string, time.Timer) string); ok {
+	if rf, ok := ret.Get(0).(func(map[string]interface{}, string, time.Time) string); ok {
 		r0 = rf(data, key, exp)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(map[string]interface{}, string, time.Timer) error); ok {
+	if rf, ok := ret.Get(1).(func(map[string]interface{}, string, time.Time) error); ok {
 		r1 = rf(data, key, exp)
 	} else {
 		r1 = ret.Error(1)
