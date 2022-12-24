@@ -15,6 +15,36 @@ type MembersUseCase struct {
 	mock.Mock
 }
 
+// Authentication provides a mock function with given fields: user, pass, tokenKey
+func (_m *MembersUseCase) Authentication(user string, pass string, tokenKey string) (string, *domains.Members, error) {
+	ret := _m.Called(user, pass, tokenKey)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string, string, string) string); ok {
+		r0 = rf(user, pass, tokenKey)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 *domains.Members
+	if rf, ok := ret.Get(1).(func(string, string, string) *domains.Members); ok {
+		r1 = rf(user, pass, tokenKey)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*domains.Members)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(string, string, string) error); ok {
+		r2 = rf(user, pass, tokenKey)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // FindMemberById provides a mock function with given fields: id
 func (_m *MembersUseCase) FindMemberById(id string) (*domains.Members, error) {
 	ret := _m.Called(id)
