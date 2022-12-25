@@ -9,16 +9,24 @@ import (
 )
 
 type HTTPHandler struct {
-	membersUseCase ports.MembersUseCase
-	response       ports.IResponse
+	membersUseCase    ports.MembersUseCase
+	response          ports.IResponse
+	authenticationKey string
 }
 
-func NewHTTPHandler(membersUseCase ports.MembersUseCase, response ports.IResponse) ports.IMembersHandler {
-	return &HTTPHandler{membersUseCase: membersUseCase, response: response}
+func NewHTTPHandler(membersUseCase ports.MembersUseCase, response ports.IResponse, key string) ports.IMembersHandler {
+	return &HTTPHandler{membersUseCase: membersUseCase, response: response, authenticationKey: key}
 }
 
 func (hdl *HTTPHandler) HelloWorld(c *fiber.Ctx) error {
-	return c.SendString("Hello, World!")
+	result := map[string]interface{}{
+		"username":    c.Locals("username"),
+		"firstName":   c.Locals("firstName"),
+		"lastName":    c.Locals("lastName"),
+		"dateOfBirth": c.Locals("dob"),
+		"createdAt":   c.Locals("createdAt"),
+	}
+	return hdl.response.JsonAuth(c, fiber.StatusOK, fmt.Sprintf("welcome you : %s %s", c.Locals("firstName"), c.Locals("lastName")), result, true, true)
 }
 
 func (hdl *HTTPHandler) Registration(c *fiber.Ctx) error {
@@ -55,16 +63,16 @@ func (hdl *HTTPHandler) Authentication(c *fiber.Ctx) error {
 		return hdl.response.ErrorRequestBody(c)
 	}
 
-	token, mem, err := hdl.membersUseCase.Authentication(req.Username, req.Password, "secret")
+	token, mem, err := hdl.membersUseCase.Authentication(req.Username, req.Password, hdl.authenticationKey)
 	if err != nil {
 		return hdl.response.Json(c, fiber.StatusOK, fmt.Sprint(err), nil, false)
 	}
 
 	result := map[string]interface{}{
-		"token":         token,
-		"username":      mem.Username,
-		"firstName":     mem.FirstName,
-		"firstLastName": mem.LastName,
+		"token":     token,
+		"username":  mem.Username,
+		"firstName": mem.FirstName,
+		"lastName":  mem.LastName,
 	}
 	return hdl.response.Json(c, fiber.StatusOK, "authentication successful", result, true)
 }

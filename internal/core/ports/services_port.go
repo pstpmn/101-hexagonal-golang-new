@@ -14,5 +14,5 @@ type ICryptoService interface {
 
 type IJwtService interface {
 	Generate(data map[string]interface{}, key string, exp time.Time) (string, error)
-	Extract(token string, key string) (map[string]string, error)
+	Extract(token string, key string) (map[string]interface{}, error)
 }

@@ -2,18 +2,18 @@ package server
 
 import (
 	"fmt"
-	"lean-oauth/internal/core/ports"
-
 	"github.com/gofiber/fiber/v2"
+	"lean-oauth/internal/core/ports"
 )
 
 type server struct {
 	membersHandler ports.IMembersHandler
+	middlewares    ports.IMiddlewares
 	env            map[string]interface{}
 }
 
-func NewServer(membersHandler ports.IMembersHandler, env map[string]interface{}) ports.IServer {
-	return &server{membersHandler: membersHandler, env: env}
+func NewServer(membersHandler ports.IMembersHandler, middlewares ports.IMiddlewares, env map[string]interface{}) ports.IServer {
+	return &server{membersHandler: membersHandler, middlewares: middlewares, env: env}
 }
 
 func (s server) Initialize() {
@@ -32,9 +32,13 @@ func (s server) Initialize() {
 }
 
 func (s server) routes(app *fiber.App) {
-	app.Get("/", s.membersHandler.HelloWorld)
 	app.Post("registration", s.membersHandler.Registration)
 	app.Post("authentication", s.membersHandler.Authentication)
+
+	// api authorize
+	auth := app.Group("/", s.middlewares.Authorize)
+	auth.Get("/", s.membersHandler.HelloWorld)
+
 }
 
 func (s server) middleware(app *fiber.App) {

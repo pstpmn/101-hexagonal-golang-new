@@ -3,13 +3,12 @@ package pkg
 import (
 	"fmt"
 	jwt "github.com/golang-jwt/jwt/v4"
-	"log"
 	"time"
 )
 
 type IJwt interface {
 	Generate(data map[string]interface{}, key string, exp time.Time) (string, error)
-	Extract(token string, key string) (map[string]string, error)
+	Extract(token string, key string) (map[string]interface{}, error)
 }
 
 type j struct {
@@ -26,7 +25,7 @@ func (j j) Generate(data map[string]interface{}, key string, exp time.Time) (str
 	return t, err
 }
 
-func (j j) Extract(clientToken string, key string) (map[string]string, error) {
+func (j j) Extract(clientToken string, key string) (map[string]interface{}, error) {
 	token, err := jwt.Parse(clientToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method")
@@ -39,8 +38,7 @@ func (j j) Extract(clientToken string, key string) (map[string]string, error) {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		log.Println(claims)
-		return nil, nil
+		return claims, nil
 	} else {
 		return nil, err
 	}

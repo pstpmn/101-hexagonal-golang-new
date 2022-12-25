@@ -50,8 +50,11 @@ func (m membersUseCase) FindMemberById(id string) (*domain.Members, error) {
 	return mem, err
 }
 
-func (m membersUseCase) Authorization(token string, key string) (data map[string]string, err error) {
+func (m membersUseCase) Authorization(token string, key string) (data map[string]interface{}, err error) {
 	data, err = m.JwtService.Extract(token, key)
+	if err != nil {
+		err = errors.New("invalid authorize token")
+	}
 	return
 }
 

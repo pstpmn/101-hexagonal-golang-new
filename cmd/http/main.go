@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"lean-oauth/internal/core/usecases"
-	handlers "lean-oauth/internal/handlers/http/members"
+	"lean-oauth/internal/protocal/http/handlers/members"
+	"lean-oauth/internal/protocal/http/middlewares"
 	membersRepositories "lean-oauth/internal/repositories/members/mysql"
 	categoriesRepositories "lean-oauth/internal/repositories/register_categories/mysql"
 	"lean-oauth/internal/server"
@@ -25,6 +26,7 @@ func main() {
 
 	mysqlEnv := dbEnv["MYSQL"].(map[string]interface{})
 	serviceEnv := appEnv["SERVICE"].(map[string]interface{})
+	authKey := fmt.Sprint(appEnv["AUTH_KEY"])
 
 	// connect db
 	var conn, err = pkg.NewConnectMysql(
@@ -46,9 +48,12 @@ func main() {
 	// usecases
 	membersUsercase := usecases.NewMembersUseCase(membersRepo, categoriesRepo, uuid, crypto, jwt)
 
-	// handlers
-	handlers := handlers.NewHTTPHandler(membersUsercase, server.NewResponse())
+	// protocal
+	handlers := handlers.NewHTTPHandler(membersUsercase, server.NewResponse(), authKey)
 
-	server := server.NewServer(handlers, serviceEnv)
+	// middlewares
+	middlewares := middlewares.NewHTTPMiddleware(membersUsercase, server.NewResponse(), authKey)
+
+	server := server.NewServer(handlers, middlewares, serviceEnv)
 	server.Initialize()
 }
