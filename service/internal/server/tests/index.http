@@ -1,0 +1,26 @@
+### Successful test: check response status is 200
+GET http://localhost:8000/
+Content-Type: application/json
+Authorize-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOiIyMDIyLTEyLTI0VDEzOjAwOjE0KzA3OjAwIiwiZG9iIjoiMjAwNi0wMS0wMlQwNzowMDowMCswNzowMCIsImV4cCI6MTY3MjA3NDY4OSwiZmlyc3ROYW1lIjoicG9uZ3NhdG9uIiwibGFzdE5hbWUiOiJwYXNtdW5lZSIsIm1lbWJlcklkIjoiNDU4YWM3NjQtZjVkYS00NTQ0LTljZTktNjZmN2QzNDkxYzQ0IiwidXNlcm5hbWUiOiIweDEwMTEifQ.ZEc_XQl-7V-Atpw2ZgHEO8t05w_Oucd_7YyqHXJM8wY
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+
+client.test("Response content-type is json", function() {
+  var type = response.contentType.mimeType;
+  client.assert(type === "application/json", "Expected 'application/json' but received '" + type + "'");
+});
+%}
+
+### Fail test: invalid token status is 400
+GET http://localhost:8000/
+Content-Type: application/json
+Authorize-Token: easdsadasdwqeqyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOiIyMDIyLTEyLTI0VDEzOjAwOjE0KzA3OjAwIiwiZG9iIjoiMjAwNi0wMS0wMlQwNzowMDowMCswNzowMCIsImV4cCI6MTY3MjA3NDY4OSwiZmlyc3ROYW1lIjoicG9uZ3NhdG9uIiwibGFzdE5hbWUiOiJwYXNtdW5lZSIsIm1lbWJlcklkIjoiNDU4YWM3NjQtZjVkYS00NTQ0LTljZTktNjZmN2QzNDkxYzQ0IiwidXNlcm5hbWUiOiIweDEwMTEifQ.ZEc_XQl-7V-Atpw2ZgHEO8t05w_Oucd_7YyqHXJM8wY
+
+> {%
+client.test("Request executed fails", function() {
+  client.assert(response.status === 400, "Response status is not 400");
+});
+%}
