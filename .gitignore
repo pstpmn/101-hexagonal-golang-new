@@ -7,6 +7,8 @@ backup
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+
+# dependencies
 /web/node_modules
 /web/.pnp
 /web/.pnp.js
@@ -23,14 +25,21 @@ backup
 
 # misc
 /web/.DS_Store
+/web/*.pem
 
 # debug
 /web/npm-debug.log*
 /web/yarn-debug.log*
 /web/yarn-error.log*
+/web/.pnpm-debug.log*
 
 # local env files
-/web/.env.local
-/web/.env.development.local
-/web/.env.test.local
-/web/.env.production.local
+/web/.env*.local
+
+# vercel
+/web/.vercel
+
+# typescript
+/web/*.tsbuildinfo
+/web/next-env.d.ts
+
