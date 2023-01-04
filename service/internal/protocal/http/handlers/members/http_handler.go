@@ -17,6 +17,19 @@ func NewHTTPHandler(membersUseCase ports2.MembersUseCase, response ports2.IRespo
 	return &HTTPHandler{membersUseCase: membersUseCase, response: response, authenticationKey: key}
 }
 
+func (hdl *HTTPHandler) Authorization(c *fiber.Ctx) error {
+	clientToken := c.Get("Authorize-token")
+	if clientToken == "" {
+		return hdl.response.Json(c, fiber.StatusBadRequest, "empty authorize token", nil, false)
+	}
+
+	if _, err := hdl.membersUseCase.Authorization(clientToken, hdl.authenticationKey); err != nil {
+		return hdl.response.Json(c, fiber.StatusBadRequest, fmt.Sprintf("%s", err), nil, false)
+	}
+
+	return hdl.response.Json(c, fiber.StatusOK, "authorize successful", nil, true)
+}
+
 func (hdl *HTTPHandler) HelloWorld(c *fiber.Ctx) error {
 	result := map[string]interface{}{
 		"username":    c.Locals("username"),

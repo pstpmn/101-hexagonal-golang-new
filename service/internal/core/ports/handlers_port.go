@@ -6,4 +6,5 @@ type IMembersHandler interface {
 	HelloWorld(c *fiber.Ctx) error
 	Registration(c *fiber.Ctx) error
 	Authentication(c *fiber.Ctx) error
+	Authorization(c *fiber.Ctx) error
 }

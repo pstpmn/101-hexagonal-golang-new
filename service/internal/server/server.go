@@ -34,6 +34,7 @@ func (s server) Initialize() {
 func (s server) routes(app *fiber.App) {
 	app.Post("registration", s.membersHandler.Registration)
 	app.Post("authentication", s.membersHandler.Authentication)
+	app.Get("authorization", s.membersHandler.Authorization)
 
 	// api authorize
 	auth := app.Group("/", s.middlewares.Authorize)
