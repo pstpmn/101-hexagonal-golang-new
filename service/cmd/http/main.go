@@ -18,6 +18,7 @@ func main() {
 	uuid := pkg.NewUuId()
 	jwt := pkg.NewJsonWebToken()
 	request := pkg.NewRequests()
+	logger := pkg.NewLogger()
 
 	// prepare environments
 	dbStr, _ := file.Read("env/db.yml")
@@ -50,11 +51,11 @@ func main() {
 	categoriesRepo := categoriesRepositories.NewRegisterCategoriesMysqlRepo(conn.GetInstance())
 
 	// usecases
-	membersUsercase := usecases.NewMembersUseCase(membersRepo, categoriesRepo, uuid, crypto, jwt, request)
-	oauth2UseCase := usecases.NewOauth2UseCase(request)
+	membersUsercase := usecases.NewMembersUseCase(membersRepo, categoriesRepo, uuid, crypto, jwt, logger, request)
+	oauth2UseCase := usecases.NewOauth2UseCase(request, logger)
 
 	// protocal
-	handlers := handlers.NewHTTPHandler(membersUsercase, oauth2UseCase, server.NewResponse(), authKey, facebookEnv)
+	handlers := handlers.NewHTTPHandler(membersUsercase, oauth2UseCase, logger, server.NewResponse(), authKey, facebookEnv)
 
 	// middlewares
 	middlewares := middlewares.NewHTTPMiddleware(membersUsercase, server.NewResponse(), authKey)

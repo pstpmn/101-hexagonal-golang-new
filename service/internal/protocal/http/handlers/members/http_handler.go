@@ -22,14 +22,14 @@ type HTTPHandler struct {
 	facebook          Facebook
 }
 
-func NewHTTPHandler(membersUseCase ports2.MembersUseCase, oauth2UseCase ports2.Oauth2UseCase, response ports2.IResponse, key string, fb map[string]interface{}) ports2.IMembersHandler {
+func NewHTTPHandler(membersUseCase ports2.MembersUseCase, oauth2UseCase ports2.Oauth2UseCase, loggerService ports2.ILogger, response ports2.IResponse, key string, fb map[string]interface{}) ports2.IMembersHandler {
 	facebook := Facebook{
 		AppId:       fmt.Sprint(fb["app_id"]),
 		AccessToken: fmt.Sprint(fb["access_token"]),
 		SecretToken: fmt.Sprint(fb["secret_key"]),
 	}
 
-	return &HTTPHandler{membersUseCase: membersUseCase, oauth2UseCase: oauth2UseCase, response: response, authenticationKey: key, facebook: facebook}
+	return &HTTPHandler{membersUseCase: membersUseCase, oauth2UseCase: oauth2UseCase, response: response, authenticationKey: key, facebook: facebook, LoggerService: loggerService}
 }
 
 func (hdl *HTTPHandler) Authorization(c *fiber.Ctx) error {

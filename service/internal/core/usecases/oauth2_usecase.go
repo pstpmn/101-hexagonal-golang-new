@@ -12,8 +12,8 @@ type oauth2UseCase struct {
 	LoggerService  ports.ILogger
 }
 
-func NewOauth2UseCase(requestService ports.IRequest) ports.Oauth2UseCase {
-	return &oauth2UseCase{RequestService: requestService}
+func NewOauth2UseCase(requestService ports.IRequest, loggerService ports.ILogger) ports.Oauth2UseCase {
+	return &oauth2UseCase{RequestService: requestService, LoggerService: loggerService}
 }
 
 func (o oauth2UseCase) AuthzFacebook(accessTokenClient string, accessToken string) (string, error) {
