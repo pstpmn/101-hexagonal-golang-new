@@ -19,7 +19,7 @@ func NewServer(membersHandler ports2.IMembersHandler, middlewares ports2.IMiddle
 func (s server) Initialize() {
 	app := fiber.New()
 
-	//init middleware
+	// init middleware
 	s.middleware(app)
 
 	// init routes
@@ -34,12 +34,16 @@ func (s server) Initialize() {
 func (s server) routes(app *fiber.App) {
 	app.Post("registration", s.membersHandler.Registration)
 	app.Post("authentication", s.membersHandler.Authentication)
-	app.Get("authorization", s.membersHandler.Authorization)
 
 	// api authorize
-	auth := app.Group("/", s.middlewares.Authorize)
-	auth.Get("/", s.membersHandler.HelloWorld)
+	authz := app.Group("/authorization")
+	authz.Get("/", s.membersHandler.Authorization)
+	authz.Get("/facebook/:accessToken", s.membersHandler.AuthorizationForFacebook)
+	authz.Get("/google", s.membersHandler.AuthorizationForGoogle)
 
+	// api for pass authorize
+	//auth := app.Group("/auth", s.middlewares.Authorize)
+	//auth.Get("/", s.membersHandler.HelloWorld)
 }
 
 func (s server) middleware(app *fiber.App) {

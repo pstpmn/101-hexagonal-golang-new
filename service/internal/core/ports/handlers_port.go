@@ -7,4 +7,6 @@ type IMembersHandler interface {
 	Registration(c *fiber.Ctx) error
 	Authentication(c *fiber.Ctx) error
 	Authorization(c *fiber.Ctx) error
+	AuthorizationForFacebook(c *fiber.Ctx) error
+	AuthorizationForGoogle(c *fiber.Ctx) error
 }

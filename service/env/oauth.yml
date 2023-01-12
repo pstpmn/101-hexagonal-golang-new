@@ -1,5 +1,7 @@
 facebook:
-  key: "secret"
+  app_id: "817832142661743"
+  access_token: "817832142661743|_Vx1271myLT4XIfOBUzSiJWYwRU"
+  secret_key: "ec98a91f0a9c4f1aba82672347b9f7f1"
 
 google:
   key: "secret"

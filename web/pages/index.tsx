@@ -1,6 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import { useFormik } from 'formik';
 import {useEffect, useState} from "react";
+import FacebookLogin from 'react-facebook-login';
+import GoogleLogin from 'react-google-login';
 
 
 export async function getServerSideProps({req}) {
@@ -20,6 +22,10 @@ export async function getServerSideProps({req}) {
             isAuthorization:isAuthorization
         },
     }
+}
+
+const responseFacebook = (response: any) => {
+    console.log(response);
 }
 
 export default function Index({isAuthorization}) {
@@ -132,20 +138,24 @@ export default function Index({isAuthorization}) {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-sm">
-                                <button  className="btn btn-light">
-                                    Google
-                                </button>
+                            <div className="col-sm ">
+                                <FacebookLogin
+                                    appId="817832142661743"
+                                    autoLoad={true}
+                                    fields="name,email,picture"
+                                    callback={responseFacebook}
+                                    textButton={"Facebook"}
+                                    size={"small"}
+                                />
                             </div>
-                            <div className="col-sm">
-                                <button className="btn btn-primary text-white">
-                                    Facebook
-                                </button>
-                            </div>
-                            <div className="col-sm">
-                                <button className="btn btn-dark">
-                                    Github
-                                </button>
+                            <div className={"col-sm"}>
+                                <GoogleLogin
+                                    clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+                                    buttonText="Login"
+                                    cookiePolicy={'single_host_origin'}
+                                    buttonText='GOOGLE'
+                                    className={""}
+                                />
                             </div>
                         </div>
                     </div>

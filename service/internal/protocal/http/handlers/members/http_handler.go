@@ -7,14 +7,29 @@ import (
 	"time"
 )
 
-type HTTPHandler struct {
-	membersUseCase    ports2.MembersUseCase
-	response          ports2.IResponse
-	authenticationKey string
+type Facebook struct {
+	AccessToken string
+	AppId       string
+	SecretToken string
 }
 
-func NewHTTPHandler(membersUseCase ports2.MembersUseCase, response ports2.IResponse, key string) ports2.IMembersHandler {
-	return &HTTPHandler{membersUseCase: membersUseCase, response: response, authenticationKey: key}
+type HTTPHandler struct {
+	membersUseCase    ports2.MembersUseCase
+	oauth2UseCase     ports2.Oauth2UseCase
+	response          ports2.IResponse
+	LoggerService     ports2.ILogger
+	authenticationKey string
+	facebook          Facebook
+}
+
+func NewHTTPHandler(membersUseCase ports2.MembersUseCase, oauth2UseCase ports2.Oauth2UseCase, response ports2.IResponse, key string, fb map[string]interface{}) ports2.IMembersHandler {
+	facebook := Facebook{
+		AppId:       fmt.Sprint(fb["app_id"]),
+		AccessToken: fmt.Sprint(fb["access_token"]),
+		SecretToken: fmt.Sprint(fb["secret_key"]),
+	}
+
+	return &HTTPHandler{membersUseCase: membersUseCase, oauth2UseCase: oauth2UseCase, response: response, authenticationKey: key, facebook: facebook}
 }
 
 func (hdl *HTTPHandler) Authorization(c *fiber.Ctx) error {
@@ -87,4 +102,16 @@ func (hdl *HTTPHandler) Authentication(c *fiber.Ctx) error {
 		"lastName":  mem.LastName,
 	}
 	return hdl.response.Json(c, fiber.StatusOK, "authentication successful", result, true)
+}
+
+func (hdl *HTTPHandler) AuthorizationForFacebook(c *fiber.Ctx) error {
+	if facebookId, err := hdl.oauth2UseCase.AuthzFacebook(c.Params("accessToken"), hdl.facebook.AccessToken); err != nil {
+		return hdl.response.Json(c, fiber.StatusOK, fmt.Sprint(err), nil, false)
+	} else {
+		return hdl.response.Json(c, fiber.StatusOK, "pass : "+facebookId, nil, true)
+	}
+}
+
+func (hdl *HTTPHandler) AuthorizationForGoogle(c *fiber.Ctx) error {
+	return hdl.response.Json(c, fiber.StatusOK, "authentication successful", nil, true)
 }

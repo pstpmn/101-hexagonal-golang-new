@@ -43,3 +43,5 @@ backup
 /web/*.tsbuildinfo
 /web/next-env.d.ts
 
+*.log
+

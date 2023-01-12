@@ -13,10 +13,12 @@ type membersUseCase struct {
 	UidService         ports2.IUuidService
 	CryptoService      ports2.ICryptoService
 	JwtService         ports2.IJwtService
+	requestService     ports2.IRequest
+	LoggerService      ports2.ILogger
 }
 
-func NewMembersUseCase(members ports2.MembersRepository, categories ports2.RegisterCategories, uidService ports2.IUuidService, crypto ports2.ICryptoService, jwt ports2.IJwtService) ports2.MembersUseCase {
-	return &membersUseCase{membersRepo: members, RegisterCategories: categories, UidService: uidService, CryptoService: crypto, JwtService: jwt}
+func NewMembersUseCase(members ports2.MembersRepository, categories ports2.RegisterCategories, uidService ports2.IUuidService, crypto ports2.ICryptoService, jwt ports2.IJwtService, request ports2.IRequest) ports2.MembersUseCase {
+	return &membersUseCase{membersRepo: members, RegisterCategories: categories, UidService: uidService, CryptoService: crypto, JwtService: jwt, requestService: request}
 }
 
 func (m membersUseCase) NewMember(user string, pass string, fistName string, lastName string, dob time.Time) (*domain.Members, error) {

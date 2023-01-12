@@ -11,3 +11,8 @@ type MembersUseCase interface {
 	Authentication(user string, pass string, tokenKey string) (string, *domain.Members, error)
 	Authorization(token string, key string) (map[string]interface{}, error)
 }
+
+type Oauth2UseCase interface {
+	AuthzFacebook(accessTokenClient string, accessToken string) (string, error)
+	//AuthzGoogle(accessTokenClient string, accessToken string) (bool, error)
+}
